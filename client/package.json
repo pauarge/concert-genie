@@ -24,6 +24,7 @@
     "bpk-component-input": "^5.0.33",
     "bpk-component-label": "^4.0.32",
     "bpk-component-section-list": "^2.0.33",
+    "bpk-component-spinner": "^3.0.32",
     "bpk-component-text": "^3.0.0",
     "bpk-mixins": "^19.1.1",
     "bpk-stylesheets": "^5.0.1",

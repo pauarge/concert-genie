@@ -9,6 +9,9 @@ import BpkSectionListItem from "bpk-component-section-list/src/BpkSectionListIte
 import BpkAutosuggestSuggestion from "bpk-component-autosuggest/src/BpkAutosuggestSuggestion";
 import BpkAutosuggest from "bpk-component-autosuggest/src/BpkAutosuggest";
 import BpkDrawer from "bpk-component-drawer";
+import {BpkExtraLargeSpinner, SPINNER_TYPES} from 'bpk-component-spinner';
+
+import STYLES from './Search.scss';
 
 const doneInterval = 250;
 
@@ -32,6 +35,7 @@ class Search extends React.Component {
       suggestions: [],
       typingTimer: null,
       results: [],
+      showSpinner: false,
       isDrawerOpen: false,
       drawerSong: '',
       drawerLyrics: '',
@@ -48,6 +52,7 @@ class Search extends React.Component {
       suggestions: [],
       typingTimer: null,
       results: [],
+      showSpinner: false,
       isDrawerOpen: false,
       drawerSong: '',
       drawerLyrics: '',
@@ -95,21 +100,27 @@ class Search extends React.Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    fetch("http://localhost:5000/?artist=" + this.state.value)
-      .then(res => res.json())
-      .then(
-        (result) => {
-          this.setState({
-            results: result,
-          });
-        },
-        error => console.log(error)
-      )
+    this.setState({
+      results: [],
+      showSpinner: true,
+    }, () => {
+      fetch("http://localhost:5000/?artist=" + this.state.value)
+        .then(res => res.json())
+        .then(
+          (result) => {
+            this.setState({
+              results: result,
+              showSpinner: false,
+            });
+          },
+          error => console.log(error)
+        )
+    })
   }
 
   onChange = (e, {newValue}) => {
     this.setState({
-      value: newValue.trim(),
+      value: newValue,
     });
   };
 
@@ -173,6 +184,12 @@ class Search extends React.Component {
             </BpkButton>
           </p>
         </form>
+        {this.state.showSpinner &&
+        <div>
+          <br />
+          <p><BpkExtraLargeSpinner type={SPINNER_TYPES.primary}/></p>
+          <p><i className={STYLES['grayedText']}>Loading results...</i></p>
+        </div>}
         {this.state.results.length > 0 &&
         <p>
           <BpkSectionList>
