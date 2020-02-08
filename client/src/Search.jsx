@@ -14,6 +14,7 @@ import BpkBannerAlert, {ALERT_TYPES} from 'bpk-component-banner-alert';
 
 import STYLES from './Search.scss';
 import BpkImage from "bpk-component-image";
+import Spinner from "./Spinner";
 
 const doneInterval = 200;
 
@@ -200,12 +201,7 @@ class Search extends React.Component {
           type={ALERT_TYPES.ERROR}
         />
         }
-        {this.state.showSpinner &&
-        <div>
-          <br/>
-          <p><BpkExtraLargeSpinner type={SPINNER_TYPES.primary}/></p>
-          <p><i className={STYLES['grayedText']}>Loading results...</i></p>
-        </div>}
+        {this.state.showSpinner && <Spinner/>}
         {this.state.results.length > 0 &&
         <div>
           <p>
