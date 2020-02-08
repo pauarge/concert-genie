@@ -37,13 +37,26 @@ class Search extends React.Component {
       drawerLyrics: '',
     };
 
+    this.clearSearch = this.clearSearch.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.getSuggestions = this.getSuggestions.bind(this);
   }
 
+  clearSearch() {
+    this.setState({
+      value: '',
+      suggestions: [],
+      typingTimer: null,
+      results: [],
+      isDrawerOpen: false,
+      drawerSong: '',
+      drawerLyrics: '',
+    });
+  }
+
   getSuggestions(val) {
     if (this.state.value.length > 2) {
-      fetch("http://localhost:5000/suggest?artist=" + val)
+      fetch("http://localhost:5000/suggest?artist=" + val.trim())
         .then(res => res.json())
         .then(
           (result) => {
@@ -96,7 +109,7 @@ class Search extends React.Component {
 
   onChange = (e, {newValue}) => {
     this.setState({
-      value: newValue,
+      value: newValue.trim(),
     });
   };
 
@@ -134,7 +147,7 @@ class Search extends React.Component {
           closeLabel="Close drawer"
           getApplicationElement={() => document.getElementById('pagewrap')}
         >
-          <div dangerouslySetInnerHTML={{ __html: this.state.drawerLyrics }} />
+          <div dangerouslySetInnerHTML={{__html: this.state.drawerLyrics}}/>
         </BpkDrawer>
         <form onSubmit={this.handleSubmit}>
           <p>
@@ -150,6 +163,10 @@ class Search extends React.Component {
             </div>
           </p>
           <p>
+            <BpkButton onClick={this.clearSearch} destructive={true}>
+              Clear
+            </BpkButton>
+            &nbsp;
             <BpkButton submit={true}>
               Search&nbsp;
               <AlignedArrow fill={colors.colorWhite}/>
@@ -160,7 +177,8 @@ class Search extends React.Component {
         <p>
           <BpkSectionList>
             <BpkSectionListSection headerText="Songs">
-              {this.state.results.map(i => <BpkSectionListItem onClick={() => this.onDrawerOpen(i)}>{i}</BpkSectionListItem>)}
+              {this.state.results.map(i => <BpkSectionListItem
+                onClick={() => this.onDrawerOpen(i)}>{i}</BpkSectionListItem>)}
             </BpkSectionListSection>
           </BpkSectionList>
         </p>}
