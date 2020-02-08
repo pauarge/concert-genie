@@ -109,6 +109,8 @@ def suggest():
         r = requests.get(artist_url, headers=headers)
         result = r.json()
         names = list(map(lambda x: x.get('name'), result.get('artist')))
+        if len(names) > 10:
+            names = names[:10]
         redis_client.set(redis_key, json.dumps(names))
         return jsonify(names)
     abort(404)
