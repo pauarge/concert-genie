@@ -1,17 +1,16 @@
+import json
+
 import networkx as nx
 import pandas as pd
 import requests
-from flask import Flask
+from flask import Flask, request, jsonify, abort
 from flask_redis import FlaskRedis
-from flask import jsonify
-import json
 
 app = Flask(__name__)
 redis_client = FlaskRedis(app)
 
 REDIS_URL = "redis://:password@localhost:6379/0"
 
-ARTIST = "mumford and sons"
 API_KEY = "ad30e075-cc83-41c3-8708-dfb5625a2330"
 
 BASE_URL = "https://api.setlist.fm/rest/1.0"
@@ -19,13 +18,13 @@ MIN_SETLIST_LEN = 5
 NUM_OF_PAGES = 2
 
 
-def get_setlist_songs():
-    cached = redis_client.get(ARTIST)
+def get_setlist_songs(artist):
+    cached = redis_client.get(artist)
 
     if cached:
         return json.loads(cached)
 
-    artist_url = "{}/search/artists/?sort=relevance&artistName={}".format(BASE_URL, ARTIST)
+    artist_url = "{}/search/artists/?sort=relevance&artistName={}".format(BASE_URL, artist)
     headers = {'x-api-key': API_KEY, 'Accept': 'application/json'}
     r = requests.get(artist_url, headers=headers)
     artists = r.json().get('artist')
@@ -49,12 +48,12 @@ def get_setlist_songs():
     }, flattened_setlists))
     only_songs = list(map(lambda x: ["begin"] + x.get('songs') + ["end"], cleaned_setlists))
 
-    redis_client.set(ARTIST, json.dumps(only_songs))
+    redis_client.set(artist, json.dumps(only_songs))
     return only_songs
 
 
-def song_list_to_df():
-    songs = get_setlist_songs()
+def song_list_to_df(artist):
+    songs = get_setlist_songs(artist)
     pairs = []
     for setlist in songs:
         for i in range(0, len(setlist) - 1):
@@ -70,19 +69,23 @@ def song_list_to_df():
 
 @app.route('/')
 def hello_world():
-    df_pairs = song_list_to_df()
-    G = nx.from_pandas_edgelist(df_pairs, 'song_org', 'next_song', ['weight'], create_using=nx.DiGraph())
+    artist = request.args.get('artist')
+    if artist:
+        df_pairs = song_list_to_df(artist)
+        graph = nx.from_pandas_edgelist(df_pairs, 'song_org', 'next_song', ['weight'], create_using=nx.DiGraph())
 
-    visited = []
-    cur = 'begin'
-    while cur != 'end':
-        visited.append(cur)
-        max_n = None
-        for n in G.neighbors(cur):
-            w = G.get_edge_data(cur, n).get('weight')
-            if not max_n or (max_n[1] < w and n not in visited):
-                max_n = (n, w)
-        cur = max_n[0]
+        visited = []
+        cur = 'begin'
+        while cur != 'end':
+            visited.append(cur)
+            max_n = None
+            for n in graph.neighbors(cur):
+                w = graph.get_edge_data(cur, n).get('weight')
+                if not max_n or (max_n[1] < w and n not in visited):
+                    max_n = (n, w)
+            cur = max_n[0]
 
-    visited.pop(0)
-    return jsonify(visited)
+        visited.pop(0)
+        return jsonify(visited)
+
+    abort(404)
