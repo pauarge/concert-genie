@@ -1,14 +1,17 @@
+import io
 import json
+import pickle
 
 import networkx as nx
 import requests
-from flask import Flask, request, jsonify, abort
+from flask import Flask, request, jsonify, abort, Response
 from flask_cors import CORS
 from flask_redis import FlaskRedis
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
 from constants import BASE_URL, API_KEY
 from lyrics import get_lyrics
-from playlists import song_list_to_df, get_playlist
+from playlists import song_list_to_df, get_playlist, visualize
 
 app = Flask(__name__)
 CORS(app)
@@ -23,9 +26,10 @@ def generate_playlists(artist):
     info_complete, df_pairs = song_list_to_df(artist)
     G = nx.from_pandas_edgelist(df_pairs, 'song_org', 'next_song', ['weight'], create_using=nx.DiGraph())
     playlist = get_playlist(G)
-    playlist.pop()
 
+    plot = visualize(G, playlist)
     redis_client.set(artist, json.dumps(playlist))
+    redis_client.set('{}-plot'.format(artist), pickle.dumps(plot))
     return playlist
 
 
@@ -33,7 +37,8 @@ def generate_playlists(artist):
 def generate():
     artist = request.args.get('artist')
     if artist:
-        return jsonify(generate_playlists(artist))
+        artist = artist.lower()
+        return jsonify(generate_playlists(artist)[1:])
     abort(404)
 
 
@@ -41,6 +46,7 @@ def generate():
 def suggest():
     artist = request.args.get('artist')
     if artist:
+        artist = artist.lower()
         redis_key = 'suggest-{}'.format(artist)
         cached = redis_client.get(redis_key)
         if cached:
@@ -63,6 +69,22 @@ def lyrics():
     artist = request.args.get('artist')
     song = request.args.get('song')
     if artist and song:
+        artist = artist.lower()
+        song = song.lower()
         result = get_lyrics(redis_client, artist, song)
         return jsonify(result)
+    abort(404)
+
+
+@app.route('/plot.png')
+def plot_png():
+    artist = request.args.get('artist')
+    if artist:
+        artist = artist.lower()
+        cache = redis_client.get('{}-plot'.format(artist))
+        if cache:
+            fig = pickle.loads(cache)
+            output = io.BytesIO()
+            FigureCanvas(fig).print_png(output)
+            return Response(output.getvalue(), mimetype='image/png')
     abort(404)

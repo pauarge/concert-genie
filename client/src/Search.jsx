@@ -12,6 +12,7 @@ import BpkDrawer from "bpk-component-drawer";
 import {BpkExtraLargeSpinner, SPINNER_TYPES} from 'bpk-component-spinner';
 
 import STYLES from './Search.scss';
+import BpkImage from "bpk-component-image";
 
 const doneInterval = 250;
 
@@ -186,19 +187,30 @@ class Search extends React.Component {
         </form>
         {this.state.showSpinner &&
         <div>
-          <br />
+          <br/>
           <p><BpkExtraLargeSpinner type={SPINNER_TYPES.primary}/></p>
           <p><i className={STYLES['grayedText']}>Loading results...</i></p>
         </div>}
         {this.state.results.length > 0 &&
-        <p>
-          <BpkSectionList>
-            <BpkSectionListSection headerText="Songs">
-              {this.state.results.map(i => <BpkSectionListItem
-                onClick={() => this.onDrawerOpen(i)}>{i}</BpkSectionListItem>)}
-            </BpkSectionListSection>
-          </BpkSectionList>
-        </p>}
+        <div>
+          <p>
+            <BpkSectionList>
+              <BpkSectionListSection headerText={this.state.results.length + " songs"}>
+                {this.state.results.map(i => <BpkSectionListItem
+                  onClick={() => this.onDrawerOpen(i)}>{i}</BpkSectionListItem>)}
+              </BpkSectionListSection>
+            </BpkSectionList>
+          </p>
+          <p>
+            <BpkImage
+              altText="plot"
+              width={816}
+              height={816}
+              src={"http://localhost:5000/plot.png?artist=" + this.state.value.toLowerCase()}
+            />
+          </p>
+        </div>
+        }
       </>);
   }
 }
