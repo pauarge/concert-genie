@@ -7,7 +7,7 @@ import requests
 from constants import API_KEY, BASE_URL
 
 MIN_SETLIST_LEN = 5
-NUM_OF_PAGES = 2
+NUM_OF_PAGES = 5
 
 
 def get_setlist_songs(raw_artist):
@@ -18,7 +18,7 @@ def get_setlist_songs(raw_artist):
     artist = artists[0]
 
     responses = []
-    for i in range(1, NUM_OF_PAGES):
+    for i in range(1,NUM_OF_PAGES+1):
         playlist_url = "{}/artist/{}/setlists/?p={}".format(BASE_URL, artist.get('mbid'), i)
         r = requests.get(playlist_url, headers=headers)
         responses.append(r.json())
@@ -57,7 +57,7 @@ def song_list_to_df(raw_artist):
 
     length_concert = df_pairs.groupby('date').count().median()['song_org']
     b = df_pairs2.groupby('date').count()
-    dates = b[(b.song_org < length_concert + 1) & (b.song_org > length_concert - 1)].index
+    dates = b[(b.song_org < length_concert + 2) & (b.song_org > length_concert - 2)].index
 
     df_pairs2 = df_pairs2[df_pairs.date.isin(dates)].groupby(['song_org', 'next_song']).size().reset_index().rename(
         columns={0: 'weight'})
@@ -75,7 +75,7 @@ def get_playlist(G, source='begin', target='end'):
         neighs = []
         for n in G.neighbors(cur):
             if n not in visited:
-                weights.append(G.get_edge_data(cur, n).get('weight'))
+                weights.append(np.exp(G.get_edge_data(cur, n).get('weight')))
                 neighs.append(n)
         weights = np.asarray(weights) / sum(weights)
         if len(weights) == 0:
