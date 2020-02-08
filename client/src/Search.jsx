@@ -8,6 +8,7 @@ import BpkSectionListSection from "bpk-component-section-list/src/BpkSectionList
 import BpkSectionListItem from "bpk-component-section-list/src/BpkSectionListItem";
 import BpkAutosuggestSuggestion from "bpk-component-autosuggest/src/BpkAutosuggestSuggestion";
 import BpkAutosuggest from "bpk-component-autosuggest/src/BpkAutosuggest";
+import BpkDrawer from "bpk-component-drawer";
 
 const doneInterval = 250;
 
@@ -30,7 +31,10 @@ class Search extends React.Component {
       value: '',
       suggestions: [],
       typingTimer: null,
-      results: []
+      results: [],
+      isDrawerOpen: false,
+      drawerSong: '',
+      drawerLyrics: '',
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -43,7 +47,6 @@ class Search extends React.Component {
         .then(res => res.json())
         .then(
           (result) => {
-            console.log(result);
             this.setState({
               suggestions: result,
             });
@@ -52,6 +55,30 @@ class Search extends React.Component {
         )
     }
   }
+
+  onDrawerOpen = (song) => {
+    fetch("http://localhost:5000/lyrics?artist=" + this.state.value + "&song=" + song)
+      .then(res => res.json())
+      .then(
+        (result) => {
+          this.setState({
+            drawerSong: song,
+            drawerLyrics: result,
+          });
+        },
+        error => console.log(error)
+      );
+
+    this.setState({
+      isDrawerOpen: true,
+    });
+  };
+
+  onDrawerClose = () => {
+    this.setState({
+      isDrawerOpen: false,
+    });
+  };
 
   handleSubmit(event) {
     event.preventDefault();
@@ -99,6 +126,16 @@ class Search extends React.Component {
 
     return (
       <>
+        <BpkDrawer
+          id="my-drawer"
+          isOpen={this.state.isDrawerOpen}
+          onClose={this.onDrawerClose}
+          title={this.state.drawerSong}
+          closeLabel="Close drawer"
+          getApplicationElement={() => document.getElementById('pagewrap')}
+        >
+          <div dangerouslySetInnerHTML={{ __html: this.state.drawerLyrics }} />
+        </BpkDrawer>
         <form onSubmit={this.handleSubmit}>
           <p>
             <div>
@@ -123,7 +160,7 @@ class Search extends React.Component {
         <p>
           <BpkSectionList>
             <BpkSectionListSection headerText="Songs">
-              {this.state.results.map(i => <BpkSectionListItem>{i}</BpkSectionListItem>)}
+              {this.state.results.map(i => <BpkSectionListItem onClick={() => this.onDrawerOpen(i)}>{i}</BpkSectionListItem>)}
             </BpkSectionListSection>
           </BpkSectionList>
         </p>}

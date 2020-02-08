@@ -7,6 +7,8 @@ from flask import Flask, request, jsonify, abort
 from flask_cors import CORS
 from flask_redis import FlaskRedis
 
+from lyrics import get_lyrics
+
 app = Flask(__name__)
 CORS(app)
 redis_client = FlaskRedis(app)
@@ -97,7 +99,8 @@ def generate():
 def suggest():
     artist = request.args.get('artist')
     if artist:
-        cached = redis_client.get('suggest-{}'.format(artist))
+        redis_key = 'suggest-{}'.format(artist)
+        cached = redis_client.get(redis_key)
         if cached:
             return jsonify(json.loads(cached))
 
@@ -106,6 +109,16 @@ def suggest():
         r = requests.get(artist_url, headers=headers)
         result = r.json()
         names = list(map(lambda x: x.get('name'), result.get('artist')))
-        redis_client.set('suggest-{}'.format(artist), json.dumps(names))
+        redis_client.set(redis_key, json.dumps(names))
         return jsonify(names)
+    abort(404)
+
+
+@app.route('/lyrics')
+def lyrics():
+    artist = request.args.get('artist')
+    song = request.args.get('song')
+    if artist and song:
+        result = get_lyrics(redis_client, artist, song)
+        return jsonify(result)
     abort(404)
