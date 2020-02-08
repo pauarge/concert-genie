@@ -10,6 +10,7 @@ import BpkAutosuggestSuggestion from "bpk-component-autosuggest/src/BpkAutosugge
 import BpkAutosuggest from "bpk-component-autosuggest/src/BpkAutosuggest";
 import BpkDrawer from "bpk-component-drawer";
 import {BpkExtraLargeSpinner, SPINNER_TYPES} from 'bpk-component-spinner';
+import BpkBannerAlert, {ALERT_TYPES} from 'bpk-component-banner-alert';
 
 import STYLES from './Search.scss';
 import BpkImage from "bpk-component-image";
@@ -40,6 +41,7 @@ class Search extends React.Component {
       isDrawerOpen: false,
       drawerSong: '',
       drawerLyrics: '',
+      errored: false,
     };
 
     this.clearSearch = this.clearSearch.bind(this);
@@ -57,6 +59,7 @@ class Search extends React.Component {
       isDrawerOpen: false,
       drawerSong: '',
       drawerLyrics: '',
+      errored: false,
     });
   }
 
@@ -70,7 +73,10 @@ class Search extends React.Component {
               suggestions: result,
             });
           },
-          error => console.log(error)
+          error => this.setState({
+            errored: true,
+            showSpinner: false
+          })
         )
     }
   }
@@ -114,7 +120,10 @@ class Search extends React.Component {
               showSpinner: false,
             });
           },
-          error => console.log(error)
+          error => this.setState({
+            errored: true,
+            showSpinner: false
+          })
         )
     })
   }
@@ -185,6 +194,12 @@ class Search extends React.Component {
             </BpkButton>
           </p>
         </form>
+        {this.state.errored &&
+        <BpkBannerAlert
+          message="Could not generate a playlist for the artist."
+          type={ALERT_TYPES.ERROR}
+        />
+        }
         {this.state.showSpinner &&
         <div>
           <br/>

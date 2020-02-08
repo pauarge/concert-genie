@@ -17,6 +17,7 @@
   ],
   "devDependencies": {
     "bpk-component-autosuggest": "^4.0.35",
+    "bpk-component-banner-alert": "^3.0.34",
     "bpk-component-button": "^3.2.11",
     "bpk-component-code": "^2.0.32",
     "bpk-component-drawer": "^2.0.34",
@@ -24,6 +25,7 @@
     "bpk-component-image": "^3.0.33",
     "bpk-component-input": "^5.0.33",
     "bpk-component-label": "^4.0.32",
+    "bpk-component-panel": "^2.0.32",
     "bpk-component-section-list": "^2.0.33",
     "bpk-component-spinner": "^3.0.32",
     "bpk-component-text": "^3.0.0",
