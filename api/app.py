@@ -4,6 +4,7 @@ import requests
 from flask import Flask
 from flask_redis import FlaskRedis
 from flask import jsonify
+import json
 
 app = Flask(__name__)
 redis_client = FlaskRedis(app)
@@ -19,6 +20,11 @@ NUM_OF_PAGES = 2
 
 
 def get_setlist_songs():
+    cached = redis_client.get(ARTIST)
+
+    if cached:
+        return json.loads(cached)
+
     artist_url = "{}/search/artists/?sort=relevance&artistName={}".format(BASE_URL, ARTIST)
     headers = {'x-api-key': API_KEY, 'Accept': 'application/json'}
     r = requests.get(artist_url, headers=headers)
@@ -43,6 +49,7 @@ def get_setlist_songs():
     }, flattened_setlists))
     only_songs = list(map(lambda x: ["begin"] + x.get('songs') + ["end"], cleaned_setlists))
 
+    redis_client.set(ARTIST, json.dumps(only_songs))
     return only_songs
 
 
