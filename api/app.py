@@ -4,9 +4,11 @@ import networkx as nx
 import pandas as pd
 import requests
 from flask import Flask, request, jsonify, abort
+from flask_cors import CORS
 from flask_redis import FlaskRedis
 
 app = Flask(__name__)
+CORS(app)
 redis_client = FlaskRedis(app)
 
 REDIS_URL = "redis://:password@localhost:6379/0"
@@ -18,13 +20,13 @@ MIN_SETLIST_LEN = 5
 NUM_OF_PAGES = 2
 
 
-def get_setlist_songs(artist):
-    cached = redis_client.get(artist)
+def get_setlist_songs(req_artist):
+    cached = redis_client.get(req_artist)
 
     if cached:
         return json.loads(cached)
 
-    artist_url = "{}/search/artists/?sort=relevance&artistName={}".format(BASE_URL, artist)
+    artist_url = "{}/search/artists/?sort=relevance&artistName={}".format(BASE_URL, req_artist)
     headers = {'x-api-key': API_KEY, 'Accept': 'application/json'}
     r = requests.get(artist_url, headers=headers)
     artists = r.json().get('artist')
@@ -48,7 +50,7 @@ def get_setlist_songs(artist):
     }, flattened_setlists))
     only_songs = list(map(lambda x: ["begin"] + x.get('songs') + ["end"], cleaned_setlists))
 
-    redis_client.set(artist, json.dumps(only_songs))
+    redis_client.set(req_artist, json.dumps(only_songs))
     return only_songs
 
 
