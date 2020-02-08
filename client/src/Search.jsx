@@ -15,7 +15,7 @@ import BpkBannerAlert, {ALERT_TYPES} from 'bpk-component-banner-alert';
 import STYLES from './Search.scss';
 import BpkImage from "bpk-component-image";
 
-const doneInterval = 250;
+const doneInterval = 200;
 
 const AlignedArrow = withButtonAlignment(LongArrowRightIconSm);
 
@@ -209,6 +209,17 @@ class Search extends React.Component {
         {this.state.results.length > 0 &&
         <div>
           <p>
+            <BpkBannerAlert
+              message="YAY! We have successfully created a playlist!"
+              type={ALERT_TYPES.SUCCESS}
+            />
+          </p>
+          <p>
+            <BpkButton submit={true} secondary={true}>
+              Export playlist to Spotify
+            </BpkButton>
+          </p>
+          <p>
             <BpkSectionList>
               <BpkSectionListSection headerText={this.state.results.length + " songs"}>
                 {this.state.results.map(i => <BpkSectionListItem
@@ -216,6 +227,7 @@ class Search extends React.Component {
               </BpkSectionListSection>
             </BpkSectionList>
           </p>
+          <h2>Connections between songs</h2>
           <p>
             <BpkImage
               altText="plot"
