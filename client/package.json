@@ -16,10 +16,12 @@
     "not op_mini all"
   ],
   "devDependencies": {
+    "bpk-component-autosuggest": "^4.0.35",
     "bpk-component-button": "^3.2.11",
     "bpk-component-code": "^2.0.32",
     "bpk-component-icon": "^5.0.33",
     "bpk-component-input": "^5.0.33",
+    "bpk-component-label": "^4.0.32",
     "bpk-component-section-list": "^2.0.33",
     "bpk-component-text": "^3.0.0",
     "bpk-mixins": "^19.1.1",

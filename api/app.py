@@ -70,7 +70,7 @@ def song_list_to_df(artist):
 
 
 @app.route('/')
-def hello_world():
+def generate():
     artist = request.args.get('artist')
     if artist:
         df_pairs = song_list_to_df(artist)
@@ -90,4 +90,22 @@ def hello_world():
         visited.pop(0)
         return jsonify(visited)
 
+    abort(404)
+
+
+@app.route('/suggest')
+def suggest():
+    artist = request.args.get('artist')
+    if artist:
+        cached = redis_client.get('suggest-{}'.format(artist))
+        if cached:
+            return jsonify(json.loads(cached))
+
+        artist_url = "{}/search/artists/?sort=relevance&artistName={}".format(BASE_URL, artist)
+        headers = {'x-api-key': API_KEY, 'Accept': 'application/json'}
+        r = requests.get(artist_url, headers=headers)
+        result = r.json()
+        names = list(map(lambda x: x.get('name'), result.get('artist')))
+        redis_client.set('suggest-{}'.format(artist), json.dumps(names))
+        return jsonify(names)
     abort(404)

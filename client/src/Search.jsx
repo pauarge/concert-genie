@@ -1,26 +1,56 @@
 import React from 'react';
 import BpkButton from 'bpk-component-button';
-import BpkInput, {INPUT_TYPES} from 'bpk-component-input';
 import {colors} from 'bpk-tokens/tokens/base.es6';
 import {withButtonAlignment} from "bpk-component-icon";
 import LongArrowRightIconSm from "bpk-component-icon/sm/long-arrow-right";
 import BpkSectionList from "bpk-component-section-list";
 import BpkSectionListSection from "bpk-component-section-list/src/BpkSectionListSection";
 import BpkSectionListItem from "bpk-component-section-list/src/BpkSectionListItem";
+import BpkAutosuggestSuggestion from "bpk-component-autosuggest/src/BpkAutosuggestSuggestion";
+import BpkAutosuggest from "bpk-component-autosuggest/src/BpkAutosuggest";
+
+const doneInterval = 250;
 
 const AlignedArrow = withButtonAlignment(LongArrowRightIconSm);
+
+const getSuggestionValue = item => item;
+
+const renderSuggestion = suggestion => (
+  <BpkAutosuggestSuggestion
+    value={suggestion}
+    indent={suggestion.indent}
+  />
+);
 
 class Search extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {value: '', results: []};
 
-    this.handleChange = this.handleChange.bind(this);
+    this.state = {
+      value: '',
+      suggestions: [],
+      typingTimer: null,
+      results: []
+    };
+
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.getSuggestions = this.getSuggestions.bind(this);
   }
 
-  handleChange(event) {
-    this.setState({value: event.target.value});
+  getSuggestions(val) {
+    if (this.state.value.length > 2) {
+      fetch("http://localhost:5000/suggest?artist=" + val)
+        .then(res => res.json())
+        .then(
+          (result) => {
+            console.log(result);
+            this.setState({
+              suggestions: result,
+            });
+          },
+          error => console.log(error)
+        )
+    }
   }
 
   handleSubmit(event) {
@@ -33,28 +63,54 @@ class Search extends React.Component {
             results: result,
           });
         },
-        // Note: it's important to handle errors here
-        // instead of a catch() block so that we don't swallow
-        // exceptions from actual bugs in components.
-        (error) => {
-          console.log(error);
-        }
+        error => console.log(error)
       )
   }
 
+  onChange = (e, {newValue}) => {
+    this.setState({
+      value: newValue,
+    });
+  };
+
+  onSuggestionsFetchRequested = ({value}) => {
+    clearTimeout(this.state.typingTimer);
+    this.setState({
+      typingTimer: setTimeout(() => this.getSuggestions(value), doneInterval)
+    });
+  };
+
+  onSuggestionsClearRequested = () => {
+    this.setState({
+      suggestions: [],
+    });
+  };
+
   render() {
+    const {value, suggestions} = this.state;
+
+    const inputProps = {
+      id: 'my-autosuggest',
+      name: 'my-autosuggest',
+      placeholder: 'Start typing an artist name...',
+      value,
+      onChange: this.onChange,
+    };
+
     return (
       <>
         <form onSubmit={this.handleSubmit}>
           <p>
-            <BpkInput
-              id="origin"
-              type={INPUT_TYPES.text}
-              name="origin"
-              placeholder="Artist"
-              value={this.state.value}
-              onChange={this.handleChange}
-            />
+            <div>
+              <BpkAutosuggest
+                suggestions={suggestions}
+                onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+                onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+                getSuggestionValue={getSuggestionValue}
+                renderSuggestion={renderSuggestion}
+                inputProps={inputProps}
+              />
+            </div>
           </p>
           <p>
             <BpkButton submit={true}>
