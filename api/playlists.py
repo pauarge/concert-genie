@@ -151,8 +151,8 @@ def get_statistics(info_complete):
     last_song = info_complete[info_complete.next_song == 'end'].groupby('song_org').count(). \
         sort_values(by=['next_song']).reset_index()
     stats['first_song'] = first_song.iloc[-1].next_song
-    stats['top_three'] = list(most_played.iloc[-3:]['next_song'].unique()[::-1])
-    stats['most_played'] = most_played.iloc[-1]['next_song']
+    stats['top_three'] = list(most_played[most_played['next_song'] != 'end'].iloc[-3:]['next_song'].unique()[::-1])
+    stats['most_played'] = most_played[most_played['next_song'] != 'end'].iloc[-1]['next_song']
     stats['last_song'] = last_song.iloc[-1].song_org
 
     return stats
