@@ -95,3 +95,9 @@ def get_popularity_song_art(sp, song, artist):
         if it['artists'][0]['name'].lower() == artist.lower():
             return it['popularity']
     return 0
+
+def get_uri_song_art(sp, song, artist):
+    for it in sp.search(song)['tracks']['items']:
+        if it['artists'][0]['name'].lower() == artist.lower():
+            return it['uri']
+    return None

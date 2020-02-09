@@ -5,7 +5,7 @@ import pandas as pd
 import requests
 
 from constants import API_KEY, BASE_URL
-from spotify_info import get_artist_info, info_pd, get_popularity_song_art
+from spotify_info import get_artist_info, info_pd, get_popularity_song_art, get_uri_song_art
 
 MIN_SETLIST_LEN = 5
 NUM_OF_PAGES = 5
@@ -70,9 +70,13 @@ def get_playlist(sp, G, artist, source='begin', target='end'):
     visited = []
     visited_score = []
     cur = source
+    uris = []
 
     while cur != target:
         visited_score.append((cur, get_popularity_song_art(sp, cur, artist)))
+        uri = get_uri_song_art(sp, cur, artist)
+        if uri:
+            uris.append(uri)
 
         visited.append(cur)
         weights = []
@@ -87,7 +91,7 @@ def get_playlist(sp, G, artist, source='begin', target='end'):
         else:
             cur = np.random.choice(neighs, 1, p=weights)[0]
 
-    return visited, visited_score
+    return visited, visited_score, uris
 
 
 def visualize(G, playlist_go):

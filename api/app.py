@@ -33,7 +33,7 @@ def generate_playlists(artist):
     info_complete, df_pairs = song_list_to_df(artist)
     stats = get_statistics(info_complete)
     G = nx.from_pandas_edgelist(df_pairs, 'song_org', 'next_song', ['weight'], create_using=nx.DiGraph())
-    playlist, playlist_score = get_playlist(sp, G, artist)
+    playlist, playlist_score, uris = get_playlist(sp, G, artist)
 
     plot = visualize(G, playlist + ["end"])
     redis_client.set(artist, json.dumps(playlist_score))
