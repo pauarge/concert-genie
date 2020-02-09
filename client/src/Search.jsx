@@ -17,6 +17,9 @@ import BpkGridRow from "bpk-component-grid/src/BpkGridRow";
 import BpkGridColumn from "bpk-component-grid/src/BpkGridColumn";
 import BpkList from "bpk-component-list/src/BpkList";
 import BpkListItem from "bpk-component-list/src/BpkListItem";
+import BpkPanel from "bpk-component-panel";
+
+import STYLES from './Search.scss';
 
 const DONE_INTERVAL = 200;
 const BASE_URL = 'http://localhost:5000';
@@ -175,45 +178,56 @@ class Search extends React.Component {
     const inputProps = {
       id: 'my-autosuggest',
       name: 'my-autosuggest',
-      placeholder: 'Start typing an artist name...',
+      placeholder: 'Start by typing an artist name...',
       value,
       onChange: this.onChange,
     };
 
     return (
       <>
-        <BpkDrawer
-          id="my-drawer"
-          isOpen={this.state.isDrawerOpen}
-          onClose={this.onDrawerClose}
-          title={this.state.drawerSong}
-          closeLabel="Close drawer"
-          getApplicationElement={() => document.getElementById('pagewrap')}
-        >
-          <div dangerouslySetInnerHTML={{__html: this.state.drawerLyrics}}/>
-        </BpkDrawer>
-        <form onSubmit={this.handleSubmit}>
-          <p>
-            <BpkAutosuggest
-              suggestions={suggestions}
-              onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
-              onSuggestionsClearRequested={this.onSuggestionsClearRequested}
-              getSuggestionValue={getSuggestionValue}
-              renderSuggestion={renderSuggestion}
-              inputProps={inputProps}
-            />
-          </p>
-          <p>
-            <BpkButton onClick={this.clearSearch} destructive={true}>
-              Clear
-            </BpkButton>
-            &nbsp;
-            <BpkButton submit={true}>
-              Search&nbsp;
-              <AlignedArrow fill={colors.colorWhite}/>
-            </BpkButton>
-          </p>
-        </form>
+        <BpkGridContainer>
+          <BpkGridRow>
+            <BpkGridColumn width={8} offset={2}>
+              <BpkPanel className={STYLES['customPanel']} fullWidth={true}>
+                Concert Genie allows you to predict what your favorite artist is going to play on their next live
+                performance.
+                Just search for whatever you feel like and we will generate a playlist for you!
+              </BpkPanel>
+              <BpkDrawer
+                id="my-drawer"
+                isOpen={this.state.isDrawerOpen}
+                onClose={this.onDrawerClose}
+                title={`${this.state.drawerSong} - Lyrics`}
+                closeLabel="Close drawer"
+                getApplicationElement={() => document.getElementById('pagewrap')}
+              >
+                <div dangerouslySetInnerHTML={{__html: this.state.drawerLyrics}}/>
+              </BpkDrawer>
+              <form onSubmit={this.handleSubmit}>
+                <p>
+                  <BpkAutosuggest
+                    suggestions={suggestions}
+                    onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+                    onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+                    getSuggestionValue={getSuggestionValue}
+                    renderSuggestion={renderSuggestion}
+                    inputProps={inputProps}
+                  />
+                </p>
+                <p>
+                  <BpkButton onClick={this.clearSearch} destructive={true}>
+                    Clear
+                  </BpkButton>
+                  &nbsp;
+                  <BpkButton submit={true}>
+                    Search&nbsp;
+                    <AlignedArrow fill={colors.colorWhite}/>
+                  </BpkButton>
+                </p>
+              </form>
+            </BpkGridColumn>
+          </BpkGridRow>
+        </BpkGridContainer>
         {this.state.errored &&
         <BpkBannerAlert
           message="Could not generate a playlist for the artist."
@@ -274,9 +288,15 @@ class Search extends React.Component {
                   </BpkSectionList>
                 </p>
                 <p><small><i>Click a song title to see the lyrics</i></small></p>
+                <h2>Export options</h2>
+                <p>Export the generated playlist so you can enjoy it later!</p>
                 <p>
-                  <BpkButton submit={true} secondary={true} onClick={this.exportSpotify}>
-                    Export playlist to Spotify
+                  <BpkButton secondary={true} onClick={this.exportSpotify}>
+                    Export to Spotify
+                  </BpkButton>
+                  &nbsp;
+                  <BpkButton secondary={true} onClick={this.exportSpotify}>
+                    Export to CSV
                   </BpkButton>
                 </p>
                 {this.state.spotifyLink &&

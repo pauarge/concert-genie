@@ -26,17 +26,13 @@
   }
 
   &__main {
-    padding: $bpk-spacing-xxl;
+    padding: $bpk-spacing-lg;
 
     @include container;
 
     @include bpk-breakpoint-mobile {
       padding: $bpk-spacing-base;
     }
-  }
-
-  &__heading {
-    margin-bottom: $bpk-spacing-sm;
   }
 
   &__text {
