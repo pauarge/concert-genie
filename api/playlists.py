@@ -18,7 +18,7 @@ def get_setlist_songs(raw_artist):
     artist = artists[0]
 
     responses = []
-    for i in range(1,NUM_OF_PAGES+1):
+    for i in range(1, NUM_OF_PAGES + 1):
         playlist_url = "{}/artist/{}/setlists/?p={}".format(BASE_URL, artist.get('mbid'), i)
         r = requests.get(playlist_url, headers=headers)
         responses.append(r.json())
@@ -122,3 +122,10 @@ def visualize(G, playlist_go):
                                alpha=0.5)
 
     return f
+
+
+def get_artist_picture(sp, artist_raw):
+    result = sp.search(artist_raw)  # search query
+    # Extract Artist's uri
+    artist_uri = [x['uri'] for x in result['tracks']['items'][0]['artists'] if x['name'].lower() == artist_raw.lower()][0]
+    return sp.artist(artist_uri)['images'][0]['url']

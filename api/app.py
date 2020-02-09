@@ -9,13 +9,19 @@ from flask_cors import CORS
 from flask_redis import FlaskRedis
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
-from constants import BASE_URL, API_KEY
+from constants import BASE_URL, API_KEY, SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET
 from lyrics import get_lyrics
-from playlists import song_list_to_df, get_playlist, visualize
+from playlists import song_list_to_df, get_playlist, visualize, get_artist_picture
+
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
 
 app = Flask(__name__)
 CORS(app)
 redis_client = FlaskRedis(app)
+
+client_credentials_manager = SpotifyClientCredentials(client_id=SPOTIFY_CLIENT_ID, client_secret=SPOTIFY_CLIENT_SECRET)
+sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)  # spotify object to access API
 
 
 def generate_playlists(artist):
@@ -38,7 +44,10 @@ def generate():
     artist = request.args.get('artist')
     if artist:
         artist = artist.lower()
-        return jsonify(generate_playlists(artist)[1:])
+        return jsonify({
+            'playlist': generate_playlists(artist)[1:],
+            'img': get_artist_picture(sp, artist)}
+        )
     abort(404)
 
 
