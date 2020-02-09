@@ -208,11 +208,6 @@ class Search extends React.Component {
         {this.state.showSpinner && <Spinner/>}
         {this.state.results.length > 0 &&
         <div>
-          <p>
-            <BpkButton submit={true} secondary={true}>
-              Export playlist to Spotify
-            </BpkButton>
-          </p>
           <BpkGridContainer>
             <BpkGridRow>
               <BpkGridColumn width={7} tabletWidth={12}>
@@ -238,10 +233,17 @@ class Search extends React.Component {
                 <p>
                   <BpkSectionList>
                     <BpkSectionListSection headerText={this.state.results.length + " songs"}>
-                      {this.state.results.map(i => <BpkSectionListItem
-                        onClick={() => this.onDrawerOpen(i)}>{i}</BpkSectionListItem>)}
+                      {this.state.results.map(i =>
+                        <BpkSectionListItem onClick={() => this.onDrawerOpen(i[0])}>
+                          <p><b>{i[0]}</b> - <i>Popularity: {i[1]}/100</i></p>
+                        </BpkSectionListItem>)}
                     </BpkSectionListSection>
                   </BpkSectionList>
+                </p>
+                <p>
+                  <BpkButton submit={true} secondary={true}>
+                    Export playlist to Spotify
+                  </BpkButton>
                 </p>
               </BpkGridColumn>
             </BpkGridRow>

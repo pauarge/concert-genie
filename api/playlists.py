@@ -136,8 +136,10 @@ def visualize(G, playlist_go):
 def get_artist_picture(sp, artist_raw):
     result = sp.search(artist_raw)  # search query
     # Extract Artist's uri
-    artist_uri = [x['uri'] for x in result['tracks']['items'][0]['artists'] if x['name'].lower() == artist_raw.lower()][0]
+    artist_uri = [x['uri'] for x in result['tracks']['items'][0]['artists'] if x['name'].lower() == artist_raw.lower()][
+        0]
     return sp.artist(artist_uri)['images'][0]['url']
+
 
 def get_artist_info_spotify(sp, name):
     spotify_albums = get_artist_info(sp, name)

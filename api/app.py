@@ -4,17 +4,16 @@ import pickle
 
 import networkx as nx
 import requests
+import spotipy
 from flask import Flask, request, jsonify, abort, Response
 from flask_cors import CORS
 from flask_redis import FlaskRedis
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from spotipy.oauth2 import SpotifyClientCredentials
 
 from constants import BASE_URL, API_KEY, SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET
 from lyrics import get_lyrics
 from playlists import song_list_to_df, get_playlist, visualize, get_artist_picture, get_artist_info_spotify
-
-import spotipy
-from spotipy.oauth2 import SpotifyClientCredentials
 
 app = Flask(__name__)
 CORS(app)
