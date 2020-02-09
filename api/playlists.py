@@ -142,3 +142,20 @@ def get_artist_picture(sp, artist_raw):
 def get_artist_info_spotify(sp, name):
     spotify_albums = get_artist_info(sp, name)
     return info_pd(sp, spotify_albums)
+
+
+def get_statistics(info_complete):
+    stats = {}
+    first_song = info_complete[info_complete.song_org == 'begin'].groupby('next_song').count(). \
+        sort_values(by=['song_org']).reset_index()
+    most_played = info_complete[['song_org', 'next_song']].groupby('next_song').count(). \
+        sort_values(by='song_org').reset_index()
+
+    last_song = info_complete[info_complete.next_song == 'end'].groupby('song_org').count(). \
+        sort_values(by=['next_song']).reset_index()
+    stats['first_song'] = first_song.iloc[-1].next_song
+    stats['top_three'] = list(most_played.iloc[-3:]['next_song'].unique()[::-1])
+    stats['most_played'] = most_played.iloc[-1]['next_song']
+    stats['last_song'] = last_song.iloc[-1].song_org
+
+    return stats
