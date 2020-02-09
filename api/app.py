@@ -11,7 +11,7 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
 from constants import BASE_URL, API_KEY, SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET
 from lyrics import get_lyrics
-from playlists import song_list_to_df, get_playlist, visualize, get_artist_picture
+from playlists import song_list_to_df, get_playlist, visualize, get_artist_picture, get_artist_info_spotify
 
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
@@ -31,12 +31,13 @@ def generate_playlists(artist):
 
     info_complete, df_pairs = song_list_to_df(artist)
     G = nx.from_pandas_edgelist(df_pairs, 'song_org', 'next_song', ['weight'], create_using=nx.DiGraph())
-    playlist = get_playlist(G)
+    pd_artist = get_artist_info_spotify(sp, artist)
+    playlist, playlist_score = get_playlist(G, pd_artist)
 
-    plot = visualize(G, playlist)
-    redis_client.set(artist, json.dumps(playlist))
+    plot = visualize(G, playlist + ["end"])
+    redis_client.set(artist, json.dumps(playlist_score))
     redis_client.set('{}-plot'.format(artist), pickle.dumps(plot))
-    return playlist
+    return playlist_score
 
 
 @app.route('/')

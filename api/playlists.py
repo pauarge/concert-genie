@@ -5,6 +5,7 @@ import pandas as pd
 import requests
 
 from constants import API_KEY, BASE_URL
+from spotify_info import get_artist_info, info_pd
 
 MIN_SETLIST_LEN = 5
 NUM_OF_PAGES = 5
@@ -65,11 +66,19 @@ def song_list_to_df(raw_artist):
     return df_pairs, df_pairs2
 
 
-def get_playlist(G, source='begin', target='end'):
+def get_playlist(G, pd_artist, source='begin', target='end'):
     visited = []
+    visited_score = []
     cur = source
 
     while cur != target:
+        if len(pd_artist[pd_artist['name'] == cur.lower()]) == 0:
+
+            visited_score.append((cur, 0))
+        else:
+            popularity = pd_artist[pd_artist['name'] == cur.lower()].groupby('name').mean()
+            visited_score.append((cur, int(popularity.iloc[0]['popularity'])))
+
         visited.append(cur)
         weights = []
         neighs = []
@@ -83,7 +92,7 @@ def get_playlist(G, source='begin', target='end'):
         else:
             cur = np.random.choice(neighs, 1, p=weights)[0]
 
-    return visited
+    return visited, visited_score
 
 
 def visualize(G, playlist_go):
@@ -129,3 +138,7 @@ def get_artist_picture(sp, artist_raw):
     # Extract Artist's uri
     artist_uri = [x['uri'] for x in result['tracks']['items'][0]['artists'] if x['name'].lower() == artist_raw.lower()][0]
     return sp.artist(artist_uri)['images'][0]['url']
+
+def get_artist_info_spotify(sp, name):
+    spotify_albums = get_artist_info(sp, name)
+    return info_pd(sp, spotify_albums)
