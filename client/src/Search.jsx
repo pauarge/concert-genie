@@ -165,7 +165,7 @@ class Search extends React.Component {
   };
 
   exportSpotify = () => {
-    fetch(`${BASE_URL}/create-playlist?artist=${this.state.value}&uris=${this.state.uris}`)
+    fetch(`${BASE_URL}/create-playlist?artist=${this.state.artist}&uris=${this.state.uris}`)
       .then(res => res.json())
       .then(
         result => this.setState({
