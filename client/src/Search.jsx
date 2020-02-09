@@ -190,7 +190,7 @@ class Search extends React.Component {
       <>
         <BpkGridContainer>
           <BpkGridRow>
-            <BpkGridColumn width={8} offset={2}>
+            <BpkGridColumn width={8} offset={2} tabletWidth={12} tabletOffset={0}>
               <BpkPanel className={STYLES['customPanel']} fullWidth={true}>
                 Concert Genie allows you to predict what your favorite artist is going to play on their next live
                 performance.
@@ -242,15 +242,15 @@ class Search extends React.Component {
         <div>
           <BpkGridContainer>
             <BpkGridRow>
-              <BpkGridColumn width={4}>
+              <BpkGridColumn width={4} mobileWidth={12}>
                 <h2>{this.state.artist}</h2>
                 <h3>Artist stats</h3>
               </BpkGridColumn>
-              <BpkGridColumn width={4}>
+              <BpkGridColumn width={4} mobileWidth={12}>
                 <p>Usually starts with <b>{this.state.stats.first_song}</b>.</p>
                 <p>Usually ends with <b>{this.state.stats.last_song}</b>.</p>
               </BpkGridColumn>
-              <BpkGridColumn width={4}>
+              <BpkGridColumn width={4} mobileWidth={12}>
                 <b>Top songs</b>:
                 <BpkList ordered>
                   <BpkListItem>{this.state.stats.top_three[0]}</BpkListItem>
