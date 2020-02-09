@@ -294,10 +294,6 @@ class Search extends React.Component {
                   <BpkButton secondary={true} onClick={this.exportSpotify}>
                     Export to Spotify
                   </BpkButton>
-                  &nbsp;
-                  <BpkButton secondary={true} onClick={this.exportSpotify}>
-                    Export to CSV
-                  </BpkButton>
                 </p>
                 {this.state.spotifyLink &&
                 <BpkBannerAlert
