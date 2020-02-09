@@ -9,12 +9,12 @@ import BpkSectionListItem from "bpk-component-section-list/src/BpkSectionListIte
 import BpkAutosuggestSuggestion from "bpk-component-autosuggest/src/BpkAutosuggestSuggestion";
 import BpkAutosuggest from "bpk-component-autosuggest/src/BpkAutosuggest";
 import BpkDrawer from "bpk-component-drawer";
-import {BpkExtraLargeSpinner, SPINNER_TYPES} from 'bpk-component-spinner';
 import BpkBannerAlert, {ALERT_TYPES} from 'bpk-component-banner-alert';
-
-import STYLES from './Search.scss';
 import BpkImage from "bpk-component-image";
 import Spinner from "./Spinner";
+import BpkGridContainer from "bpk-component-grid/src/BpkGridContainer";
+import BpkGridRow from "bpk-component-grid/src/BpkGridRow";
+import BpkGridColumn from "bpk-component-grid/src/BpkGridColumn";
 
 const doneInterval = 200;
 
@@ -38,6 +38,7 @@ class Search extends React.Component {
       suggestions: [],
       typingTimer: null,
       results: [],
+      artistImg: null,
       showSpinner: false,
       isDrawerOpen: false,
       drawerSong: '',
@@ -56,6 +57,7 @@ class Search extends React.Component {
       suggestions: [],
       typingTimer: null,
       results: [],
+      artistImg: null,
       showSpinner: false,
       isDrawerOpen: false,
       drawerSong: '',
@@ -65,7 +67,7 @@ class Search extends React.Component {
   }
 
   getSuggestions(val) {
-    if (this.state.value.length > 2) {
+    if (this.state.value.length > 1) {
       fetch("http://localhost:5000/suggest?artist=" + val.trim())
         .then(res => res.json())
         .then(
@@ -117,8 +119,10 @@ class Search extends React.Component {
         .then(
           (result) => {
             this.setState({
-              results: result,
+              results: result['playlist'],
+              artistImg: result['img'],
               showSpinner: false,
+              errored: false
             });
           },
           error => this.setState({
@@ -205,33 +209,43 @@ class Search extends React.Component {
         {this.state.results.length > 0 &&
         <div>
           <p>
-            <BpkBannerAlert
-              message="YAY! We have successfully created a playlist!"
-              type={ALERT_TYPES.SUCCESS}
-            />
-          </p>
-          <p>
             <BpkButton submit={true} secondary={true}>
               Export playlist to Spotify
             </BpkButton>
           </p>
-          <p>
-            <BpkSectionList>
-              <BpkSectionListSection headerText={this.state.results.length + " songs"}>
-                {this.state.results.map(i => <BpkSectionListItem
-                  onClick={() => this.onDrawerOpen(i)}>{i}</BpkSectionListItem>)}
-              </BpkSectionListSection>
-            </BpkSectionList>
-          </p>
-          <h2>Connections between songs</h2>
-          <p>
-            <BpkImage
-              altText="plot"
-              width={816}
-              height={816}
-              src={"http://localhost:5000/plot.png?artist=" + this.state.value.toLowerCase()}
-            />
-          </p>
+          <BpkGridContainer>
+            <BpkGridRow>
+              <BpkGridColumn width={7} tabletWidth={12}>
+                <p>
+                  <BpkImage
+                    altText="plot"
+                    width={512}
+                    height={512}
+                    src={this.state.artistImg}
+                  />
+                </p>
+                <h2>Connections between songs</h2>
+                <p>
+                  <BpkImage
+                    altText="plot"
+                    width={512}
+                    height={512}
+                    src={"http://localhost:5000/plot.png?artist=" + this.state.value.toLowerCase()}
+                  />
+                </p>
+              </BpkGridColumn>
+              <BpkGridColumn width={5} tabletWidth={12}>
+                <p>
+                  <BpkSectionList>
+                    <BpkSectionListSection headerText={this.state.results.length + " songs"}>
+                      {this.state.results.map(i => <BpkSectionListItem
+                        onClick={() => this.onDrawerOpen(i)}>{i}</BpkSectionListItem>)}
+                    </BpkSectionListSection>
+                  </BpkSectionList>
+                </p>
+              </BpkGridColumn>
+            </BpkGridRow>
+          </BpkGridContainer>
         </div>
         }
       </>);

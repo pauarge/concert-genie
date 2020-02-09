@@ -21,6 +21,7 @@
     "bpk-component-button": "^3.2.11",
     "bpk-component-code": "^2.0.32",
     "bpk-component-drawer": "^2.0.34",
+    "bpk-component-grid": "^2.0.32",
     "bpk-component-icon": "^5.0.33",
     "bpk-component-image": "^3.0.33",
     "bpk-component-input": "^5.0.33",

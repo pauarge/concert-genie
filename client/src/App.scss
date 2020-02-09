@@ -1,7 +1,7 @@
 @import '~bpk-mixins';
 
 @mixin container {
-  max-width: $bpk-breakpoint-tablet;
+  max-width: $bpk-breakpoint-desktop;
   margin: 0 auto;
 }
 
