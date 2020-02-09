@@ -89,3 +89,9 @@ def info_pd(sp, spotify_albums):
     artist_df = pd.DataFrame.from_dict(dic_df)
     artist_df['name'] = artist_df['name'].apply(lambda x: x.lower())
     return artist_df
+
+def get_popularity_song_art(sp, song, artist):
+    for it in sp.search(song)['tracks']['items']:
+        if it['artists'][0]['name'].lower() == artist.lower():
+            return it['popularity']
+    return 0
