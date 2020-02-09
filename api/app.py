@@ -82,9 +82,7 @@ def generate():
             'playlist': playlist[1:],
             'img': get_artist_picture(sp, artist),
             'stats': statistics,
-            'uris': uris
-        }
-        )
+            'uris': uris})
     abort(404)
 
 
