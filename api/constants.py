@@ -1,6 +1,5 @@
 import os
 
-REDIS_URL = "redis://:password@localhost:6379/0"
 BASE_URL = "https://api.setlist.fm/rest/1.0"
 
 API_BASE = 'https://accounts.spotify.com'
@@ -11,3 +10,4 @@ SHOW_DIALOG = True
 API_KEY = os.environ.get('SETLIST_API_KEY')
 SPOTIFY_CLIENT_ID = os.environ.get('SPOTIFY_CLIENT_ID')
 SPOTIFY_CLIENT_SECRET = os.environ.get('SPOTIFY_CLIENT_SECRET')
+REDIS_URL = os.environ.get('REDIS_URL')
