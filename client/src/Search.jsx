@@ -211,7 +211,26 @@ class Search extends React.Component {
         {this.state.showSpinner && <Spinner/>}
         {this.state.results.length > 0 &&
         <div>
+
           <BpkGridContainer>
+            <BpkGridRow>
+              <BpkGridColumn width={4}>
+                <h2>{this.state.value}</h2>
+                <h3>Artist stats</h3>
+              </BpkGridColumn>
+              <BpkGridColumn width={4}>
+                <p>Usually starts with <b>{this.state.stats.first_song}</b>.</p>
+                <p>Usually ends with <b>{this.state.stats.last_song}</b>.</p>
+              </BpkGridColumn>
+              <BpkGridColumn width={4}>
+                Top songs:
+                <BpkList ordered>
+                  <BpkListItem>{this.state.stats.top_three[0]}</BpkListItem>
+                  <BpkListItem>{this.state.stats.top_three[1]}</BpkListItem>
+                  <BpkListItem>{this.state.stats.top_three[2]}</BpkListItem>
+                </BpkList>
+              </BpkGridColumn>
+            </BpkGridRow>
             <BpkGridRow>
               <BpkGridColumn width={7} tabletWidth={12}>
                 <p>
@@ -231,15 +250,6 @@ class Search extends React.Component {
                     src={"http://localhost:5000/plot.png?artist=" + this.state.value.toLowerCase()}
                   />
                 </p>
-                <h2>Artist Stats</h2>
-                <p>Usually starts with <b>{this.state.stats.first_song}</b>.</p>
-                <p>Usually ends with <b>{this.state.stats.last_song}</b>.</p>
-                <p>Top three songs:</p>
-                <BpkList ordered>
-                  <BpkListItem>{this.state.stats.top_three[0]}</BpkListItem>
-                  <BpkListItem>{this.state.stats.top_three[1]}</BpkListItem>
-                  <BpkListItem>{this.state.stats.top_three[2]}</BpkListItem>
-                </BpkList>
               </BpkGridColumn>
               <BpkGridColumn width={5} tabletWidth={12}>
                 <p>
