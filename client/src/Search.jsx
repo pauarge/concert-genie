@@ -45,6 +45,7 @@ class Search extends React.Component {
       uris: [],
       showSpinner: false,
       isDrawerOpen: false,
+      spotifyLink: null,
       drawerSong: '',
       drawerLyrics: '',
       errored: false,
@@ -66,6 +67,7 @@ class Search extends React.Component {
       uris: [],
       showSpinner: false,
       isDrawerOpen: false,
+      spotifyLink: null,
       drawerSong: '',
       drawerLyrics: '',
       errored: false,
@@ -123,7 +125,8 @@ class Search extends React.Component {
             stats: result['stats'],
             uris: result['uris'],
             showSpinner: false,
-            errored: false
+            errored: false,
+            spotifyLink: null,
           }),
           error => {
             console.log(error);
@@ -159,7 +162,9 @@ class Search extends React.Component {
     fetch(`${BASE_URL}/create-playlist?artist=${this.state.value}&uris=${this.state.uris}`)
       .then(res => res.json())
       .then(
-        result => console.log(result),
+        result => this.setState({
+          spotifyLink: result
+        }),
         error => console.log(error),
       )
   };
@@ -229,7 +234,7 @@ class Search extends React.Component {
                 <p>Usually ends with <b>{this.state.stats.last_song}</b>.</p>
               </BpkGridColumn>
               <BpkGridColumn width={4}>
-                Top songs:
+                <b>Top songs</b>:
                 <BpkList ordered>
                   <BpkListItem>{this.state.stats.top_three[0]}</BpkListItem>
                   <BpkListItem>{this.state.stats.top_three[1]}</BpkListItem>
@@ -273,6 +278,11 @@ class Search extends React.Component {
                     Export playlist to Spotify
                   </BpkButton>
                 </p>
+                {this.state.spotifyLink &&
+                <BpkBannerAlert
+                  message={`Created a Spotify playlist: ${this.state.spotifyLink}`}
+                  type={ALERT_TYPES.SUCCESS}
+                />}
               </BpkGridColumn>
             </BpkGridRow>
           </BpkGridContainer>

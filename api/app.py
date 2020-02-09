@@ -179,5 +179,5 @@ def create_playlist():
         print(json.dumps(response))
         resp2 = spo.user_playlist_add_tracks("pauarge1234", response.get('uri'), splitted_uris)
         print(json.dumps(resp2))
-        return jsonify('OK')
+        return jsonify(response.get('external_urls').get('spotify'))
     abort(404)
