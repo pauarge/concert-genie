@@ -26,8 +26,9 @@ sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)  # s
 
 def generate_playlists(artist):
     cache = redis_client.get(artist)
-    if cache:
-        return json.loads(cache)
+    cache_stats = redis_client.get('{}-stats'.format(artist))
+    if cache and cache_stats:
+        return json.loads(cache), json.loads(cache_stats)
 
     info_complete, df_pairs = song_list_to_df(artist)
     stats = get_statistics(info_complete)
@@ -37,6 +38,7 @@ def generate_playlists(artist):
 
     plot = visualize(G, playlist + ["end"])
     redis_client.set(artist, json.dumps(playlist_score))
+    redis_client.set('{}-stats', json.dumps(stats))
     redis_client.set('{}-plot'.format(artist), pickle.dumps(plot))
     return playlist_score, stats
 

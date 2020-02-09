@@ -15,8 +15,11 @@ import Spinner from "./Spinner";
 import BpkGridContainer from "bpk-component-grid/src/BpkGridContainer";
 import BpkGridRow from "bpk-component-grid/src/BpkGridRow";
 import BpkGridColumn from "bpk-component-grid/src/BpkGridColumn";
+import BpkList from "bpk-component-list/src/BpkList";
+import BpkListItem from "bpk-component-list/src/BpkListItem";
 
-const doneInterval = 200;
+const DONE_INTERVAL = 200;
+const BASE_URL = 'http://localhost:5000';
 
 const AlignedArrow = withButtonAlignment(LongArrowRightIconSm);
 
@@ -44,11 +47,11 @@ class Search extends React.Component {
       drawerSong: '',
       drawerLyrics: '',
       errored: false,
+      stats: {}
     };
 
     this.clearSearch = this.clearSearch.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.getSuggestions = this.getSuggestions.bind(this);
   }
 
   clearSearch() {
@@ -63,37 +66,37 @@ class Search extends React.Component {
       drawerSong: '',
       drawerLyrics: '',
       errored: false,
+      stats: {}
     });
   }
 
   getSuggestions(val) {
     if (this.state.value.length > 1) {
-      fetch("http://localhost:5000/suggest?artist=" + val.trim())
+      fetch(`${BASE_URL}/suggest?artist=${val.trim()}`)
         .then(res => res.json())
         .then(
-          (result) => {
+          result => this.setState({
+            suggestions: result,
+          }),
+          error => {
+            console.log(error);
             this.setState({
-              suggestions: result,
-            });
-          },
-          error => this.setState({
-            errored: true,
-            showSpinner: false
-          })
+              errored: true,
+              showSpinner: false
+            })
+          }
         )
     }
   }
 
   onDrawerOpen = (song) => {
-    fetch("http://localhost:5000/lyrics?artist=" + this.state.value + "&song=" + song)
+    fetch(`${BASE_URL}/lyrics?artist=${this.state.value}&song=${song}`)
       .then(res => res.json())
       .then(
-        (result) => {
-          this.setState({
-            drawerSong: song,
-            drawerLyrics: result,
-          });
-        },
+        result => this.setState({
+          drawerSong: song,
+          drawerLyrics: result,
+        }),
         error => console.log(error)
       );
 
@@ -114,21 +117,23 @@ class Search extends React.Component {
       results: [],
       showSpinner: true,
     }, () => {
-      fetch("http://localhost:5000/?artist=" + this.state.value)
+      fetch(`${BASE_URL}/?artist=${this.state.value}`)
         .then(res => res.json())
         .then(
-          (result) => {
+          result => this.setState({
+            results: result['playlist'],
+            artistImg: result['img'],
+            stats: result['stats'],
+            showSpinner: false,
+            errored: false
+          }),
+          error => {
+            console.log(error);
             this.setState({
-              results: result['playlist'],
-              artistImg: result['img'],
-              showSpinner: false,
-              errored: false
-            });
-          },
-          error => this.setState({
-            errored: true,
-            showSpinner: false
-          })
+              errored: true,
+              showSpinner: false
+            })
+          }
         )
     })
   }
@@ -142,7 +147,7 @@ class Search extends React.Component {
   onSuggestionsFetchRequested = ({value}) => {
     clearTimeout(this.state.typingTimer);
     this.setState({
-      typingTimer: setTimeout(() => this.getSuggestions(value), doneInterval)
+      typingTimer: setTimeout(() => this.getSuggestions(value), DONE_INTERVAL)
     });
   };
 
@@ -177,16 +182,14 @@ class Search extends React.Component {
         </BpkDrawer>
         <form onSubmit={this.handleSubmit}>
           <p>
-            <div>
-              <BpkAutosuggest
-                suggestions={suggestions}
-                onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
-                onSuggestionsClearRequested={this.onSuggestionsClearRequested}
-                getSuggestionValue={getSuggestionValue}
-                renderSuggestion={renderSuggestion}
-                inputProps={inputProps}
-              />
-            </div>
+            <BpkAutosuggest
+              suggestions={suggestions}
+              onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+              onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+              getSuggestionValue={getSuggestionValue}
+              renderSuggestion={renderSuggestion}
+              inputProps={inputProps}
+            />
           </p>
           <p>
             <BpkButton onClick={this.clearSearch} destructive={true}>
@@ -228,6 +231,15 @@ class Search extends React.Component {
                     src={"http://localhost:5000/plot.png?artist=" + this.state.value.toLowerCase()}
                   />
                 </p>
+                <h2>Artist Stats</h2>
+                <p>Usually starts with <b>{this.state.stats.first_song}</b>.</p>
+                <p>Usually ends with <b>{this.state.stats.last_song}</b>.</p>
+                <p>Top three songs:</p>
+                <BpkList ordered>
+                  <BpkListItem>{this.state.stats.top_three[0]}</BpkListItem>
+                  <BpkListItem>{this.state.stats.top_three[1]}</BpkListItem>
+                  <BpkListItem>{this.state.stats.top_three[2]}</BpkListItem>
+                </BpkList>
               </BpkGridColumn>
               <BpkGridColumn width={5} tabletWidth={12}>
                 <p>
