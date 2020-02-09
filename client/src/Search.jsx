@@ -273,6 +273,7 @@ class Search extends React.Component {
                     </BpkSectionListSection>
                   </BpkSectionList>
                 </p>
+                <p><small><i>Click a song title to see the lyrics</i></small></p>
                 <p>
                   <BpkButton submit={true} secondary={true} onClick={this.exportSpotify}>
                     Export playlist to Spotify
