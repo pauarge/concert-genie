@@ -42,6 +42,7 @@ class Search extends React.Component {
       typingTimer: null,
       results: [],
       artistImg: null,
+      uris: [],
       showSpinner: false,
       isDrawerOpen: false,
       drawerSong: '',
@@ -52,6 +53,7 @@ class Search extends React.Component {
 
     this.clearSearch = this.clearSearch.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.exportSpotify = this.exportSpotify.bind(this);
   }
 
   clearSearch() {
@@ -61,6 +63,7 @@ class Search extends React.Component {
       typingTimer: null,
       results: [],
       artistImg: null,
+      uris: [],
       showSpinner: false,
       isDrawerOpen: false,
       drawerSong: '',
@@ -78,13 +81,7 @@ class Search extends React.Component {
           result => this.setState({
             suggestions: result,
           }),
-          error => {
-            console.log(error);
-            this.setState({
-              errored: true,
-              showSpinner: false
-            })
-          }
+          error => console.log(error)
         )
     }
   }
@@ -124,6 +121,7 @@ class Search extends React.Component {
             results: result['playlist'],
             artistImg: result['img'],
             stats: result['stats'],
+            uris: result['uris'],
             showSpinner: false,
             errored: false
           }),
@@ -155,6 +153,15 @@ class Search extends React.Component {
     this.setState({
       suggestions: [],
     });
+  };
+
+  exportSpotify = () => {
+    fetch(`${BASE_URL}/create-playlist?artist=${this.state.value}&uris=${this.state.uris}`)
+      .then(res => res.json())
+      .then(
+        result => console.log(result),
+        error => console.log(error),
+      )
   };
 
   render() {
@@ -211,7 +218,6 @@ class Search extends React.Component {
         {this.state.showSpinner && <Spinner/>}
         {this.state.results.length > 0 &&
         <div>
-
           <BpkGridContainer>
             <BpkGridRow>
               <BpkGridColumn width={4}>
@@ -263,7 +269,7 @@ class Search extends React.Component {
                   </BpkSectionList>
                 </p>
                 <p>
-                  <BpkButton submit={true} secondary={true}>
+                  <BpkButton submit={true} secondary={true} onClick={this.exportSpotify}>
                     Export playlist to Spotify
                   </BpkButton>
                 </p>
