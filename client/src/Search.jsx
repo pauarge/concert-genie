@@ -49,6 +49,7 @@ class Search extends React.Component {
       showSpinner: false,
       isDrawerOpen: false,
       spotifyLink: null,
+      artist: '',
       drawerSong: '',
       drawerLyrics: '',
       errored: false,
@@ -74,7 +75,8 @@ class Search extends React.Component {
       drawerSong: '',
       drawerLyrics: '',
       errored: false,
-      stats: {}
+      stats: {},
+      artist: ''
     });
   }
 
@@ -130,6 +132,7 @@ class Search extends React.Component {
             showSpinner: false,
             errored: false,
             spotifyLink: null,
+            artist: this.state.value
           }),
           error => {
             console.log(error);
@@ -240,7 +243,7 @@ class Search extends React.Component {
           <BpkGridContainer>
             <BpkGridRow>
               <BpkGridColumn width={4}>
-                <h2>{this.state.value}</h2>
+                <h2>{this.state.artist}</h2>
                 <h3>Artist stats</h3>
               </BpkGridColumn>
               <BpkGridColumn width={4}>
@@ -272,7 +275,7 @@ class Search extends React.Component {
                     altText="plot"
                     width={512}
                     height={512}
-                    src={"http://localhost:5000/plot.png?artist=" + this.state.value.toLowerCase()}
+                    src={"http://localhost:5000/plot.png?artist=" + this.state.artist.toLowerCase()}
                   />
                 </p>
               </BpkGridColumn>
@@ -288,11 +291,9 @@ class Search extends React.Component {
                   </BpkSectionList>
                 </p>
                 <p><small><i>Click a song title to see the lyrics</i></small></p>
-                <h2>Export options</h2>
-                <p>Export the generated playlist so you can enjoy it later!</p>
                 <p>
                   <BpkButton secondary={true} onClick={this.exportSpotify}>
-                    Export to Spotify
+                    Export playlist to Spotify
                   </BpkButton>
                 </p>
                 {this.state.spotifyLink &&

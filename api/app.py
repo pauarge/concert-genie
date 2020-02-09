@@ -47,7 +47,11 @@ def generate_playlists(artist):
 
 # Checks to see if token is valid and gets a new token if not
 def get_token():
-    token_info = pickle.loads(redis_client.get("token_info"))
+    raw_token_info = redis_client.get("token_info")
+    if raw_token_info:
+        token_info = pickle.loads(raw_token_info)
+    else:
+        token_info = None
 
     # Checking if the session already has a token stored
     if not token_info:
