@@ -10,12 +10,15 @@ from flask_cors import CORS
 from flask_redis import FlaskRedis
 from spotipy.oauth2 import SpotifyClientCredentials
 
-from constants import BASE_URL, API_KEY, SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, REDIRECT_URI, SCOPE
+from constants import BASE_URL, API_KEY, SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, REDIRECT_URI, SCOPE, REDIS_URL
 from lyrics import get_lyrics
 from playlists import song_list_to_df, get_playlist, get_artist_picture, get_statistics
 
 app = Flask(__name__)
 app.secret_key = "super_secret_key"
+app.config.update(
+    REDIS_URL=REDIS_URL,
+)
 CORS(app)
 redis_client = FlaskRedis(app)
 
