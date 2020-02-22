@@ -8,7 +8,6 @@ import BpkSectionListSection from "bpk-component-section-list/src/BpkSectionList
 import BpkSectionListItem from "bpk-component-section-list/src/BpkSectionListItem";
 import BpkAutosuggestSuggestion from "bpk-component-autosuggest/src/BpkAutosuggestSuggestion";
 import BpkAutosuggest from "bpk-component-autosuggest/src/BpkAutosuggest";
-import BpkDrawer from "bpk-component-drawer";
 import BpkBannerAlert, {ALERT_TYPES} from 'bpk-component-banner-alert';
 import BpkImage from "bpk-component-image";
 import Spinner from "./Spinner";
@@ -22,7 +21,7 @@ import BpkPanel from "bpk-component-panel";
 import STYLES from './Search.scss';
 
 const DONE_INTERVAL = 200;
-const BASE_URL = 'http://localhost:5000';
+const BASE_URL = 'https://concert-genie.herokuapp.com';
 
 const AlignedArrow = withButtonAlignment(LongArrowRightIconSm);
 
@@ -47,11 +46,8 @@ class Search extends React.Component {
       artistImg: null,
       uris: [],
       showSpinner: false,
-      isDrawerOpen: false,
       spotifyLink: null,
       artist: '',
-      drawerSong: '',
-      drawerLyrics: '',
       errored: false,
       stats: {}
     };
@@ -70,10 +66,7 @@ class Search extends React.Component {
       artistImg: null,
       uris: [],
       showSpinner: false,
-      isDrawerOpen: false,
       spotifyLink: null,
-      drawerSong: '',
-      drawerLyrics: '',
       errored: false,
       stats: {},
       artist: ''
@@ -92,28 +85,6 @@ class Search extends React.Component {
         )
     }
   }
-
-  onDrawerOpen = (song) => {
-    fetch(`${BASE_URL}/lyrics?artist=${this.state.value}&song=${song}`)
-      .then(res => res.json())
-      .then(
-        result => this.setState({
-          drawerSong: song,
-          drawerLyrics: result,
-        }),
-        error => console.log(error)
-      );
-
-    this.setState({
-      isDrawerOpen: true,
-    });
-  };
-
-  onDrawerClose = () => {
-    this.setState({
-      isDrawerOpen: false,
-    });
-  };
 
   handleSubmit(event) {
     event.preventDefault();
@@ -196,16 +167,6 @@ class Search extends React.Component {
                 performance.
                 Just search for whatever you feel like and we will generate a playlist for you!
               </BpkPanel>
-              <BpkDrawer
-                id="my-drawer"
-                isOpen={this.state.isDrawerOpen}
-                onClose={this.onDrawerClose}
-                title={`${this.state.drawerSong} - Lyrics`}
-                closeLabel="Close drawer"
-                getApplicationElement={() => document.getElementById('pagewrap')}
-              >
-                <div dangerouslySetInnerHTML={{__html: this.state.drawerLyrics}}/>
-              </BpkDrawer>
               <form onSubmit={this.handleSubmit}>
                 <p>
                   <BpkAutosuggest
@@ -275,18 +236,17 @@ class Search extends React.Component {
                   <BpkSectionList>
                     <BpkSectionListSection headerText={this.state.results.length + " songs"}>
                       {this.state.results.map(i =>
-                        <BpkSectionListItem onClick={() => this.onDrawerOpen(i[0])}>
+                        <BpkSectionListItem>
                           <p><b>{i[0]}</b> - <i>Popularity: {i[1]}/100</i></p>
                         </BpkSectionListItem>)}
                     </BpkSectionListSection>
                   </BpkSectionList>
                 </p>
-                <p><small><i>Click a song title to see the lyrics</i></small></p>
-                <p>
-                  <BpkButton secondary={true} onClick={this.exportSpotify}>
-                    Export playlist to Spotify
-                  </BpkButton>
-                </p>
+                {/*<p>*/}
+                {/*  <BpkButton secondary={true} onClick={this.exportSpotify}>*/}
+                {/*    Export playlist to Spotify*/}
+                {/*  </BpkButton>*/}
+                {/*</p>*/}
                 {this.state.spotifyLink &&
                 <BpkBannerAlert
                   message={`Created a Spotify playlist: ${this.state.spotifyLink}`}

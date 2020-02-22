@@ -11,7 +11,6 @@ from flask_redis import FlaskRedis
 from spotipy.oauth2 import SpotifyClientCredentials
 
 from constants import BASE_URL, API_KEY, SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, REDIRECT_URI, SCOPE, REDIS_URL
-from lyrics import get_lyrics
 from playlists import song_list_to_df, get_playlist, get_artist_picture, get_statistics
 
 app = Flask(__name__)
@@ -109,18 +108,6 @@ def suggest():
             names = names[:10]
         redis_client.set(redis_key, json.dumps(names))
         return jsonify(names)
-    abort(404)
-
-
-@app.route('/lyrics')
-def lyrics():
-    artist = request.args.get('artist')
-    song = request.args.get('song')
-    if artist and song:
-        artist = artist.lower()
-        song = song.lower()
-        result = get_lyrics(redis_client, artist, song)
-        return jsonify(result)
     abort(404)
 
 
