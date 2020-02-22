@@ -13,15 +13,14 @@ def get_albums_info(sp_albums):
     return album_names, album_uris
 
 
-def album_songs(sp, uri, name, spotify_albums):
-    album = uri  # assign album uri to a_name
-    spotify_albums[album] = {}  # Creates dictionary for that specific album
-    # Create keys-values of empty lists inside nested dictionary for album
-    spotify_albums[album]['album'] = []  # create empty list
-    spotify_albums[album]['track_number'] = []
-    spotify_albums[album]['id'] = []
-    spotify_albums[album]['name'] = []
-    spotify_albums[album]['uri'] = []
+def album_songs(sp, album, name, spotify_albums):
+    spotify_albums[album] = {
+        'album': [],
+        'track_number': [],
+        'id': [],
+        'name': [],
+        'uri': [],
+    }
     tracks = sp.album_tracks(album)  # pull data on album tracks
     for n in range(len(tracks['items'])):  # for each song track
         spotify_albums[album]['album'].append(name)  # append album name tracked via album_count

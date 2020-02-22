@@ -6,7 +6,7 @@ import STYLES from './App.scss';
 import Search from './Search';
 
 
-const App = () => (
+export default () => (
   <div className={STYLES['App']}>
     <header className={STYLES['App__header']}>
       <div className={STYLES['App__header-inner']}>
@@ -18,5 +18,3 @@ const App = () => (
     </main>
   </div>
 );
-
-export default App;
