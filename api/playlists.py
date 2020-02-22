@@ -1,5 +1,3 @@
-import matplotlib.pyplot as plt
-import networkx as nx
 import numpy as np
 import pandas as pd
 import requests
@@ -92,44 +90,6 @@ def get_playlist(sp, G, artist, source='begin', target='end'):
             cur = np.random.choice(neighs, 1, p=weights)[0]
 
     return visited, visited_score, uris
-
-
-def visualize(G, playlist_go):
-    all_weights = []
-
-    f, ax = plt.subplots(figsize=(20, 20))
-    plt.tight_layout()
-    pos = nx.circular_layout(G)
-    pos_higher = {}
-    for k, v in pos.items():
-        pos_higher[k] = (v[0] * 1.1, v[1] * 1.1)
-
-    nx.draw_networkx_nodes(G.nodes, pos=pos)
-    nx.draw_networkx_labels(G, pos=pos_higher)
-    colors = ['r', 'b', 'y']
-    edges_1 = []
-    for i in range(len(playlist_go) - 1):
-        edges_1.append((playlist_go[i], playlist_go[i + 1]))
-
-    for (node1, node2, data) in G.edges(data=True):
-        all_weights.append(data['weight'])
-
-    unique_weights = list(set(all_weights))
-
-    # plot edges with weighted widths
-    for weight in unique_weights:
-        # Form a filtered list with just the weight you want to draw
-        weighted_edges = [(node1, node2) for (node1, node2, edge_attr) in G.edges(data=True) if
-                          edge_attr['weight'] == weight]
-        width = weight * 0.1
-        nx.draw_networkx_edges(G, pos, edgelist=weighted_edges, width=width, edge_color='k', ax=ax)
-
-    # plot Playlist path
-    for ctr, edges_l in enumerate([edges_1]):
-        nx.draw_networkx_edges(G, pos=pos, edgelist=edges_l, edge_color=colors[ctr], style='dashed', ax=ax, width=4,
-                               alpha=0.5)
-
-    return f
 
 
 def get_artist_picture(sp, artist_raw):

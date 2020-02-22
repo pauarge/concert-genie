@@ -26,7 +26,8 @@ def get_lyrics(redis_client, artist, song_title):
         soup = BeautifulSoup(content, 'html.parser')
         lyrics = str(soup)
         # lyrics lies between up_partition and down_partition
-        up_partition = '<!-- Usage of azlyrics.com content by any third-party lyrics provider is prohibited by our licensing agreement. Sorry about that. -->'
+        up_partition = '<!-- Usage of azlyrics.com content by any third-party lyrics provider is prohibited by our ' \
+                       'licensing agreement. Sorry about that. --> '
         down_partition = '<!-- MxM banner -->'
         lyrics = lyrics.split(up_partition)[1]
         lyrics = lyrics.split(down_partition)[0]

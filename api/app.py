@@ -1,4 +1,3 @@
-import io
 import json
 import pickle
 import time
@@ -6,15 +5,14 @@ import time
 import networkx as nx
 import requests
 import spotipy
-from flask import Flask, request, jsonify, abort, Response, redirect, session
+from flask import Flask, request, jsonify, abort, redirect, session
 from flask_cors import CORS
 from flask_redis import FlaskRedis
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from spotipy.oauth2 import SpotifyClientCredentials
 
 from constants import BASE_URL, API_KEY, SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, REDIRECT_URI, SCOPE
 from lyrics import get_lyrics
-from playlists import song_list_to_df, get_playlist, visualize, get_artist_picture, get_statistics
+from playlists import song_list_to_df, get_playlist, get_artist_picture, get_statistics
 
 app = Flask(__name__)
 app.secret_key = "super_secret_key"
@@ -37,11 +35,9 @@ def generate_playlists(artist):
     G = nx.from_pandas_edgelist(df_pairs, 'song_org', 'next_song', ['weight'], create_using=nx.DiGraph())
     playlist, playlist_score, uris = get_playlist(sp, G, artist)
 
-    plot = visualize(G, playlist + ["end"])
     redis_client.set(artist, json.dumps(playlist_score))
     redis_client.set('{}-stats'.format(artist), json.dumps(stats))
     redis_client.set('{}-uris'.format(artist), json.dumps(uris))
-    redis_client.set('{}-plot'.format(artist), pickle.dumps(plot))
     return playlist_score, stats, uris
 
 
@@ -70,6 +66,11 @@ def get_token():
         token_info = sp_oauth.refresh_access_token(token_info.get('refresh_token'))
 
     return token_info, True
+
+
+@app.route('/healthcheck')
+def healtcheck():
+    return jsonify('healthy')
 
 
 @app.route('/')
@@ -117,20 +118,6 @@ def lyrics():
         song = song.lower()
         result = get_lyrics(redis_client, artist, song)
         return jsonify(result)
-    abort(404)
-
-
-@app.route('/plot.png')
-def plot_png():
-    artist = request.args.get('artist')
-    if artist:
-        artist = artist.lower()
-        cache = redis_client.get('{}-plot'.format(artist))
-        if cache:
-            fig = pickle.loads(cache)
-            output = io.BytesIO()
-            FigureCanvas(fig).print_png(output)
-            return Response(output.getvalue(), mimetype='image/png')
     abort(404)
 
 

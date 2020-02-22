@@ -269,15 +269,6 @@ class Search extends React.Component {
                     src={this.state.artistImg}
                   />
                 </p>
-                <h2>Connections between songs</h2>
-                <p>
-                  <BpkImage
-                    altText="plot"
-                    width={512}
-                    height={512}
-                    src={"http://localhost:5000/plot.png?artist=" + this.state.artist.toLowerCase()}
-                  />
-                </p>
               </BpkGridColumn>
               <BpkGridColumn width={5} tabletWidth={12}>
                 <p>

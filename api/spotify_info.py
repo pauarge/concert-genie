@@ -13,7 +13,7 @@ def get_albums_info(sp_albums):
     return album_names, album_uris
 
 
-def albumSongs(sp, uri, name, spotify_albums):
+def album_songs(sp, uri, name, spotify_albums):
     album = uri  # assign album uri to a_name
     spotify_albums[album] = {}  # Creates dictionary for that specific album
     # Create keys-values of empty lists inside nested dictionary for album
@@ -48,8 +48,8 @@ def get_artist_info(sp, raw_artist):
     for i, name in zip(album_uris, album_names):  # each album
         if name not in checked_albs:
             checked_albs.append(name)
-            spotify_albums = albumSongs(sp, i, name, spotify_albums)
-            album_count += 1  # Updates album count once all tracks have been addedb
+            spotify_albums = album_songs(sp, i, name, spotify_albums)
+            album_count += 1  # Updates album count once all tracks have been added
 
     return spotify_albums
 
@@ -61,7 +61,6 @@ def audio_features(sp, album):
     track_count = 0
     for track in album['uri']:
         # pull audio features per track
-        features = sp.audio_features(track)
         pop = sp.track(track)
         album['popularity'].append(pop['popularity'])
         track_count += 1
@@ -69,23 +68,15 @@ def audio_features(sp, album):
 
 def info_pd(sp, spotify_albums):
     sleep_min = 2
-    sleep_max = 5
-    start_time = time.time()
+    sleep_max = 4
     request_count = 0
 
     for i in spotify_albums:
         audio_features(sp, spotify_albums[i])
         request_count += 1
         if request_count % 5 == 0:
-            print(str(request_count) + " playlists completed")
             time.sleep(np.random.uniform(sleep_min, sleep_max))
-    dic_df = {}
-    dic_df['album'] = []
-    dic_df['track_number'] = []
-    dic_df['id'] = []
-    dic_df['name'] = []
-    dic_df['uri'] = []
-    dic_df['popularity'] = []
+    dic_df = {'album': [], 'track_number': [], 'id': [], 'name': [], 'uri': [], 'popularity': []}
     for album in spotify_albums:
         for feature in dic_df.keys():
             dic_df[feature].extend(spotify_albums[album][feature])
