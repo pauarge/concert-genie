@@ -70,11 +70,6 @@ def get_token():
     return token_info, True
 
 
-@app.route('/healthcheck')
-def healtcheck():
-    return jsonify('healthy')
-
-
 @app.route('/')
 def generate():
     artist = request.args.get('artist')
@@ -155,9 +150,7 @@ def create_playlist():
             abort(403)
         spo = spotipy.Spotify(auth=token_info.get('access_token'))
         me = spo.me()
-        response = spo.user_playlist_create(me.get('id'), 'ICHack - {}'.format(artist))
-        print(json.dumps(response))
-        resp2 = spo.user_playlist_add_tracks(me.get('id'), response.get('uri'), splitted_uris)
-        print(json.dumps(resp2))
+        response = spo.user_playlist_create(me.get('id'), 'Concert playlist - {}'.format(artist))
+        spo.user_playlist_add_tracks(me.get('id'), response.get('uri'), splitted_uris)
         return jsonify(response.get('external_urls').get('spotify'))
     abort(404)
