@@ -21,7 +21,8 @@ import BpkPanel from "bpk-component-panel";
 import STYLES from './Search.scss';
 
 const DONE_INTERVAL = 200;
-const BASE_URL = 'https://concert-genie.herokuapp.com';
+// const BASE_URL = 'https://concert-genie.herokuapp.com';
+const BASE_URL = 'http://127.0.0.1:5000';
 
 const AlignedArrow = withButtonAlignment(LongArrowRightIconSm);
 

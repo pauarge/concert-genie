@@ -131,8 +131,7 @@ def api_callback():
     code = request.args.get('code')
     token_info = sp_oauth.get_access_token(code)
 
-    # Saving the access token along with all other token related info
-    redis_client.set('token_info', pickle.dumps(token_info))
+    # TODO: Redirect with user token
     return jsonify(token_info)
 
 
